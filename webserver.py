@@ -130,6 +130,18 @@ class webServerHandler(BaseHTTPRequestHandler):
                     self.send_header('Location', '/restaurants')
                     self.end_headers()
 
+            if self.path.endswith("/delete"):
+                restID = self.path.split("/")[2]
+                restUpdate = session.query(Restaurant).filter_by(id=restID).one()
+
+                session.delete(restUpdate)
+                session.commit()
+
+                self.send_response(301)
+                self.send_header('Content-type', 'text/html')
+                self.send_header('Location', '/restaurants')
+                self.end_headers()
+
         except:
             pass
 
