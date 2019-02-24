@@ -53,6 +53,25 @@ class webServerHandler(BaseHTTPRequestHandler):
                 print output
                 return
 
+            if self.path.endswith("/edit"):
+                restID = self.path.split("/")[1]
+                restUpdate = session.query(Restaurant).filter_by(id=restID).one()
+
+                if restUpdate:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+
+                    output = ""
+                    output += "<html><body><h1>%s</h1>" % restUpdate.name
+                    output += "<form method='POST' enctype='multipart/form-data' action='/edit'>"
+                    output += "<input name='newRestName' type='text' placeholder='%s'>" % restUpdate.name
+                    output += "<input type='submit' value='Rename'>"
+                    output += "</form></body></html>"
+                    self.wfile.write(output)
+                    print output
+                    return
+
         except IOError:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
