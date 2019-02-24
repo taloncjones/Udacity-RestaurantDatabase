@@ -2,7 +2,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import cgi
 from database_setup import Base, Restaurant, MenuItem
 from sqlalchemy import create_engine
-from sqlalchemy import sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 
 # Create DB session
@@ -20,9 +20,14 @@ class webServerHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
+
+                restaurants = session.query(Restaurant).all()
+
                 output = ""
                 output += "<html><body>"
-
+                for restaurant in restaurants:
+                    output += restaurant.name
+                    output += "<br>"
                 output += "</body></html>"
                 self.wfile.write(output)
                 print output
