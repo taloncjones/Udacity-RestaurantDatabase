@@ -58,20 +58,21 @@ class webServerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            ctype, pdict = cgi.parse_header(
-                self.headers.getheader('content-type'))
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                messagecontent = fields.get('restName')
+            if self.path.endswith("/restaurants/new"):
+                ctype, pdict = cgi.parse_header(
+                    self.headers.getheader('content-type'))
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get('restName')
 
-                newRest = Restaurant(name=messagecontent[0])
-                session.add(newRest)
-                session.commit()
+                    newRest = Restaurant(name=messagecontent[0])
+                    session.add(newRest)
+                    session.commit()
 
-                self.send_response(301)
-                self.send_header('Content-type', 'text/html')
-                self.send_header('Location', '/restaurants')
-                self.end_headers()
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
 
         except:
             pass
