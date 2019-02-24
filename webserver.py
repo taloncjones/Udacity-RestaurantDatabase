@@ -25,6 +25,8 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                 output = ""
                 output += "<html><body>"
+                output += "<a href='/restaurants/new'>Make a New Restaurant Here</a><br><br>"
+
                 for restaurant in restaurants:
                     output += restaurant.name
                     output += "<br>"
