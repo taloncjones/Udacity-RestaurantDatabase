@@ -3,6 +3,12 @@
 # Webserver code for Udacity Lesson 2 Making a Web Server
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import cgi
+
+
+my_form = """<form method='POST' enctype='multipart/form-data' action='/hello'>
+<h2>What would you like me to say?</h2><input name='message' type='text'>
+<input type='submit' value='Submit'></form>"""
 
 
 class WebServerHandler(BaseHTTPRequestHandler):
@@ -14,7 +20,9 @@ class WebServerHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             message = ""
-            message += "<html><body>Hello!</body></html>"
+            message += "<html><body>Hello!"
+            message += my_form
+            message += "</body></html>"
             self.wfile.write(message.encode())
             print(message)
             return
@@ -25,14 +33,40 @@ class WebServerHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             message = ""
-            message += "<html><body>&#161Hola! <a href = '/hello' >Back to \
-              Hello</a></body></html>"
+            message += "<html><body>&#161Hola!"
+            message += "<a href = '/hello' >Back to Hello</a>"
+            message += my_form
+            message += "</body></html>"
             self.wfile.write(message.encode())
             print(message)
             return
 
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
+
+    def do_POST(self):
+        try:
+            self.send_response(301)
+            self.end_headers()
+
+            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+            if ctype == 'multipart/form-data':
+                fields = cgi.parse_multipart(self.rfile, pdict)
+                messagecontent = fields.get('message')
+
+            output = ""
+            output += "<html><body>"
+            output += "<h2> Okay, how about this: </h2>"
+            output += "<h1> %s </h1>" % messagecontent[0]
+
+            output += my_form
+            output += "</body></html>"
+            self.wfile.write(output.encode())
+            print(output)
+            return
+
+        except:
+            pass
 
 
 def main():
