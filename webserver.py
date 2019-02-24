@@ -31,7 +31,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                     output += restaurant.name
                     output += "<br>"
                     output += "<a href='/restaurants/%s/edit'>Edit</a><br>" % restaurant.id
-                    output += "<a href='#'>Delete</a><br>"
+                    output += "<a href='/restaurants/%s/delete'>Delete</a><br>" % restaurant.id
                     output += "<br>"
                 output += "</body></html>"
                 self.wfile.write(output)
@@ -67,6 +67,24 @@ class webServerHandler(BaseHTTPRequestHandler):
                     output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/%s/edit'>" % restID
                     output += "<input name='newRestName' type='text' placeholder='%s'>" % restUpdate.name
                     output += "<input type='submit' value='Rename'>"
+                    output += "</form></body></html>"
+                    self.wfile.write(output)
+                    print output
+                    return
+
+            if self.path.endswith("/delete"):
+                restID = self.path.split("/")[2]
+                restUpdate = session.query(Restaurant).filter_by(id=restID).one()
+
+                if restUpdate:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+
+                    output = ""
+                    output += "<html><body><h1>Are you sure you want to delete %s?</h1>" % restUpdate.name
+                    output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/%s/delete'>" % restID
+                    output += "<input type='submit' value='Delete'>"
                     output += "</form></body></html>"
                     self.wfile.write(output)
                     print output
