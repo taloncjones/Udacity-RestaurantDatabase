@@ -30,7 +30,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                 for restaurant in restaurants:
                     output += restaurant.name
                     output += "<br>"
-                    output += "<a href='%s/edit'>Edit</a><br>" % restaurant.id
+                    output += "<a href='/restaurants/%s/edit'>Edit</a><br>" % restaurant.id
                     output += "<a href='#'>Delete</a><br>"
                     output += "<br>"
                 output += "</body></html>"
@@ -54,7 +54,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                 return
 
             if self.path.endswith("/edit"):
-                restID = self.path.split("/")[1]
+                restID = self.path.split("/")[2]
                 restUpdate = session.query(Restaurant).filter_by(id=restID).one()
 
                 if restUpdate:
@@ -64,7 +64,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                     output = ""
                     output += "<html><body><h1>%s</h1>" % restUpdate.name
-                    output += "<form method='POST' enctype='multipart/form-data' action='/edit'>"
+                    output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/%s/edit'>" % restID
                     output += "<input name='newRestName' type='text' placeholder='%s'>" % restUpdate.name
                     output += "<input type='submit' value='Rename'>"
                     output += "</form></body></html>"
@@ -86,6 +86,25 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                     newRest = Restaurant(name=messagecontent[0])
                     session.add(newRest)
+                    session.commit()
+
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
+
+            if self.path.endswith("/edit"):
+                ctype, pdict = cgi.parse_header(
+                    self.headers.getheader('content-type'))
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get('newRestName')
+
+                    restID = self.path.split("/")[2]
+                    restUpdate = session.query(Restaurant).filter_by(id=restID).one()
+
+                    restUpdate.name = messagecontent[0]
+                    session.add(restUpdate)
                     session.commit()
 
                     self.send_response(301)
