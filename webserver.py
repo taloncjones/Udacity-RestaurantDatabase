@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+# Webserver code for Udacity Lesson 2 Making a Web Server
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
