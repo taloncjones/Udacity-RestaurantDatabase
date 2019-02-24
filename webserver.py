@@ -2,7 +2,7 @@
 
 # Webserver code for Udacity Lesson 2 Making a Web Server
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 class WebServerHandler(BaseHTTPRequestHandler):
